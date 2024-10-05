@@ -14,7 +14,7 @@ class SettingsScreen extends StatelessWidget {
           width: double.infinity,
           child: const Center(
             child: Text(
-              'Settings',
+              'Screen Settings',
               style: TextStyle(
                 fontSize: 50,
                 color: Colors.white,
