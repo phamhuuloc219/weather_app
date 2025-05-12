@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import '../weather_detail_screen.dart';
 import '/constants/app_colors.dart';
 import '/constants/text_styles.dart';
 import '/extensions/datetime.dart';
@@ -19,6 +19,7 @@ class WeatherScreen extends ConsumerWidget {
 
     return weatherData.when(
       data: (weather) {
+        print('WeatherScreen displaying city: ${weather.name}'); // Log để debug
         return GradientContainer(
           children: [
             Column(
@@ -32,17 +33,13 @@ class WeatherScreen extends ConsumerWidget {
                   weather.name,
                   style: TextStyles.h1,
                 ),
-
                 const SizedBox(height: 20),
-
                 // Today's date
                 Text(
                   DateTime.now().dateTime,
                   style: TextStyles.subtitleText,
                 ),
-
                 const SizedBox(height: 30),
-
                 // Weather icon big
                 SizedBox(
                   height: 260,
@@ -51,9 +48,7 @@ class WeatherScreen extends ConsumerWidget {
                     fit: BoxFit.contain,
                   ),
                 ),
-
                 const SizedBox(height: 30),
-
                 // Weather description
                 Text(
                   weather.weather[0].description.capitalize,
@@ -61,19 +56,15 @@ class WeatherScreen extends ConsumerWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 40),
-
             // Weather info in a row
             WeatherInfo(weather: weather),
-
             const SizedBox(height: 40),
-
             // Today Daily Forecast
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   'Today',
                   style: TextStyle(
                     fontSize: 20,
@@ -81,7 +72,37 @@ class WeatherScreen extends ConsumerWidget {
                   ),
                 ),
                 InkWell(
-                  child: Text(
+                  onTap: () {
+                    print('View full report tapped at ${DateTime.now()}');
+                    // Truyền thẳng dữ liệu đến WeatherDetailScreen với xử lý null
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) {
+                          final currentDate = DateTime.fromMillisecondsSinceEpoch(
+                            weather.dt * 1000,
+                          );
+                          return WeatherDetailScreen(
+                            city: weather.name ?? 'Unknown City',
+                            date: currentDate.toIso8601String().split('T')[0], // YYYY-MM-DD
+                            weatherCode: weather.weather[0].id ?? 0, // Giá trị mặc định nếu null
+                            maxTemp: weather.main.temp ?? 0.0, // Giá trị mặc định nếu null
+                            minTemp: weather.main.temp ?? 0.0, // Giá trị mặc định nếu null
+                            windSpeed: weather.wind.speed ?? 0.0,
+                            humidity: weather.main.humidity ?? 0, // Giá trị mặc định nếu null
+                            feelsLike: weather.main.feelsLike ?? 0.0,
+                            sunrise: DateTime.fromMillisecondsSinceEpoch(
+                              weather.sys.sunrise * 1000,
+                            ).toIso8601String().split('T')[1].substring(0, 5) ?? '00:00',
+                            sunset: DateTime.fromMillisecondsSinceEpoch(
+                              weather.sys.sunset * 1000,
+                            ).toIso8601String().split('T')[1].substring(0, 5) ?? '00:00',
+                          );
+                        },
+                      ),
+                    );
+                  },
+                  child: const Text(
                     'View full report',
                     style: TextStyle(
                       color: AppColors.lightBlue,
@@ -90,10 +111,8 @@ class WeatherScreen extends ConsumerWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 15),
-
-            // hourly forcast
+            // hourly forecast
             const HourlyForecastView(),
           ],
         );

@@ -1,93 +1,290 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:flutter/material.dart';
+// import '../views/hourly_forecast_view.dart';
+// import '/constants/app_colors.dart';
+// import '/constants/text_styles.dart';
+// import '/utils/get_weather_icons.dart';
+// import '/views/gradient_container.dart';
+//
+// class WeatherDetailScreen extends StatelessWidget {
+//   final String city;
+//   final String date;
+//   final int weatherCode;
+//   final double maxTemp;
+//   final double minTemp;
+//   final double windSpeed;
+//   final int humidity;
+//   final double feelsLike;
+//   final String sunrise;
+//   final String sunset;
+//
+//   const WeatherDetailScreen({
+//     super.key,
+//     required this.city,
+//     required this.date,
+//     required this.weatherCode,
+//     required this.maxTemp,
+//     required this.minTemp,
+//     required this.windSpeed,
+//     required this.humidity,
+//     required this.feelsLike,
+//     required this.sunrise,
+//     required this.sunset,
+//   });
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: GradientContainer(
+//         children: [
+//           const SizedBox(height: 50),
+//           Center(
+//             child: Column(
+//               children: [
+//                 Text(city, style: TextStyles.h1),
+//                 const SizedBox(height: 10),
+//                 Text(date, style: TextStyles.subtitleText),
+//                 const SizedBox(height: 30),
+//                 Image.asset(
+//                   getWeatherIcon2(weatherCode),
+//                   width: 180,
+//                   height: 180,
+//                 ),
+//                 const SizedBox(height: 20),
+//                 Text(
+//                   '${maxTemp.toStringAsFixed(1)}° / ${minTemp.toStringAsFixed(1)}°',
+//                   style: TextStyles.h2,
+//                 ),
+//                 const SizedBox(height: 10),
+//                 Text(
+//                   'Cảm giác như: ${feelsLike.toStringAsFixed(1)}°C',
+//                   style: TextStyles.subtitleText,
+//                 ),
+//               ],
+//             ),
+//           ),
+//
+//           const SizedBox(height: 40),
+//
+//           Padding(
+//             padding: const EdgeInsets.symmetric(horizontal: 10),
+//             child: Column(
+//               children: [
+//                 Row(
+//                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                   children: [
+//                     _buildWeatherCard(Icons.wind_power, 'Tốc độ gió', '${windSpeed.toStringAsFixed(1)} km/h'),
+//                     SizedBox(width: 2,),
+//                     _buildWeatherCard(Icons.water_drop, 'Độ ẩm', '$humidity%'),
+//                   ],
+//                 ),
+//                 const SizedBox(height: 14),
+//                 Row(
+//                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                   children: [
+//                     _buildWeatherCard(Icons.wb_sunny_outlined, 'Mặt trời mọc', sunrise),
+//                     SizedBox(width: 2,),
+//                     _buildWeatherCard(Icons.nightlight_outlined, 'Mặt trời lặn', sunset),
+//                   ],
+//                 ),
+//
+//               ],
+//             ),
+//           ),
+//           SizedBox(height: 15,),
+//           Padding(
+//             padding: const EdgeInsets.symmetric(horizontal: 20),
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: const [
+//                 HourlyForecastView(),
+//               ],
+//             ),
+//           ),
+//
+//         ],
+//       ),
+//     );
+//   }
+//
+//   Widget _buildWeatherCard(IconData icon, String title, String value) {
+//     return Container(
+//       width: 160,
+//       padding: const EdgeInsets.all(16),
+//       decoration: BoxDecoration(
+//         color: AppColors.accentBlue,
+//         borderRadius: BorderRadius.circular(20),
+//       ),
+//       child: Column(
+//         mainAxisSize: MainAxisSize.min,
+//         children: [
+//           Icon(icon, color: AppColors.white, size: 32),
+//           const SizedBox(height: 10),
+//           Text(title, style: TextStyles.h3, textAlign: TextAlign.center),
+//           const SizedBox(height: 6),
+//           Text(value, style: TextStyles.subtitleText),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Thêm để tùy chỉnh thanh trạng thái
+import '/views/hourly_forecast_view.dart';
+import '/constants/app_colors.dart';
 import '/constants/text_styles.dart';
-import '/extensions/datetime.dart';
-import '/extensions/strings.dart';
-import '/providers/get_city_forecast_provider.dart';
-import '/screens/weather_screen/weather_info.dart';
+import '/utils/get_weather_icons.dart';
 import '/views/gradient_container.dart';
 
-class WeatherDetailScreen extends ConsumerWidget {
+class WeatherDetailScreen extends StatelessWidget {
+  final String city;
+  final String date;
+  final int weatherCode;
+  final double maxTemp;
+  final double minTemp;
+  final double windSpeed;
+  final int humidity;
+  final double feelsLike;
+  final String sunrise;
+  final String sunset;
+
   const WeatherDetailScreen({
     super.key,
-    required this.cityName,
+    required this.city,
+    required this.date,
+    required this.weatherCode,
+    required this.maxTemp,
+    required this.minTemp,
+    required this.windSpeed,
+    required this.humidity,
+    required this.feelsLike,
+    required this.sunrise,
+    required this.sunset,
   });
 
-  final String cityName;
-
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final weatherData = ref.watch((cityForecastProvider(cityName)));
+  Widget build(BuildContext context) {
+    // Tùy chỉnh màu thanh trạng thái
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: AppColors.secondaryBlack, // Màu nền thanh trạng thái
+        statusBarIconBrightness: Brightness.light, // Màu biểu tượng sáng (trắng)
+      ),
+    );
 
     return Scaffold(
-      body: weatherData.when(
-        data: (weather) {
-          return GradientContainer(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(
-                    height: 30,
-                    width: double.infinity,
-                  ),
-                  // Country name text
-                  Text(
-                    weather.name,
-                    style: TextStyles.h1,
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Today's date
-                  Text(
-                    DateTime.now().dateTime,
-                    style: TextStyles.subtitleText,
-                  ),
-
-                  const SizedBox(height: 50),
-
-                  // Weather icon big
-                  SizedBox(
-                    height: 300,
-                    child: Image.asset(
-                      'assets/icons/${weather.weather[0].icon.replaceAll('n', 'd')}.png',
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-
-                  const SizedBox(height: 50),
-
-                  // Weather description
-                  Text(
-                    weather.weather[0].description.capitalize,
-                    style: TextStyles.h2,
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 40),
-
-              // Weather info in a row
-              WeatherInfo(weather: weather),
-
-              const SizedBox(height: 15),
-            ],
-          );
-        },
-        error: (error, stackTrace) {
-          return const Center(
-            child: Text(
-              'An error has occurred',
+      appBar: AppBar(
+        title: Text(
+          'Weather Details - $city',
+          style: TextStyles.h1.copyWith(decoration: TextDecoration.none),
+        ),
+        backgroundColor: AppColors.secondaryBlack, // Đặt màu nền cho AppBar
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.white), // Màu trắng để nổi bật
+          onPressed: () {
+            Navigator.pop(context); // Quay về trang trước
+          },
+        ),
+      ),
+      body: GradientContainer(
+        children: [
+          const SizedBox(height: 5),
+          Center(
+            child: Column(
+              children: [
+                Text(
+                  city,
+                  style: TextStyles.h1.copyWith(decoration: TextDecoration.none),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  date,
+                  style: TextStyles.subtitleText.copyWith(decoration: TextDecoration.none),
+                ),
+                const SizedBox(height: 30),
+                Image.asset(
+                  getWeatherIcon2(weatherCode),
+                  width: 180,
+                  height: 180,
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  '${maxTemp.toStringAsFixed(1)}° / ${minTemp.toStringAsFixed(1)}°',
+                  style: TextStyles.h2.copyWith(decoration: TextDecoration.none),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Cảm giác như: ${feelsLike.toStringAsFixed(1)}°C',
+                  style: TextStyles.subtitleText.copyWith(decoration: TextDecoration.none),
+                ),
+              ],
             ),
-          );
-        },
-        loading: () {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        },
+          ),
+          const SizedBox(height: 40),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildWeatherCard(Icons.wind_power, 'Tốc độ gió', '${windSpeed.toStringAsFixed(1)} km/h'),
+                    const SizedBox(width: 2),
+                    _buildWeatherCard(Icons.water_drop, 'Độ ẩm', '$humidity%'),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildWeatherCard(Icons.wb_sunny_outlined, 'Mặt trời mọc', sunrise),
+                    const SizedBox(width: 2),
+                    _buildWeatherCard(Icons.nightlight_outlined, 'Mặt trời lặn', sunset),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 15),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                HourlyForecastView(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWeatherCard(IconData icon, String title, String value) {
+    return Container(
+      width: 160,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.accentBlue,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: AppColors.white, size: 32),
+          const SizedBox(height: 10),
+          Text(
+            title,
+            style: TextStyles.h3.copyWith(decoration: TextDecoration.none),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: TextStyles.subtitleText.copyWith(decoration: TextDecoration.none),
+          ),
+        ],
       ),
     );
   }
