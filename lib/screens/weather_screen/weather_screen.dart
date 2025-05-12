@@ -19,7 +19,6 @@ class WeatherScreen extends ConsumerWidget {
 
     return weatherData.when(
       data: (weather) {
-        print('WeatherScreen displaying city: ${weather.name}'); // Log để debug
         return GradientContainer(
           children: [
             Column(
@@ -73,8 +72,6 @@ class WeatherScreen extends ConsumerWidget {
                 ),
                 InkWell(
                   onTap: () {
-                    print('View full report tapped at ${DateTime.now()}');
-                    // Truyền thẳng dữ liệu đến WeatherDetailScreen với xử lý null
                     Navigator.push(
                       context,
                       MaterialPageRoute(

@@ -1,25 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:weather_app/models/city_weather.dart';
+import 'package:weather_app/providers/search_provider.dart';
 import 'package:weather_app/screens/search_detail_screen.dart';
 import 'package:weather_app/services/api_helper.dart';
 import 'package:weather_app/screens/weather_detail_screen.dart';
 import 'package:weather_app/constants/app_colors.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-class CityWeather {
-  final String name;
-  final String condition;
-  final String temp;
-  final String tempMax;
-  final String tempMin;
-
-  CityWeather({
-    required this.name,
-    required this.condition,
-    required this.temp,
-    required this.tempMax,
-    required this.tempMin,
-  });
-}
 
 class SearchHomeScreen extends StatefulWidget {
   const SearchHomeScreen({super.key});
@@ -38,17 +23,11 @@ class _SearchHomeScreenState extends State<SearchHomeScreen> {
     loadSearchHistory();
   }
 
-  Future<List<String>> getSearchHistory() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getStringList('search_history') ?? [];
-  }
-
   Future<void> loadSearchHistory() async {
     setState(() => isLoading = true);
     final cityNames = await getSearchHistory();
     final List<CityWeather> loaded = [];
     for (var city in cityNames) {
-      try {
         final data = await ApiHelper.getWeatherByCityName(cityName: city);
         final temp = data.main.temp;
         final cond = data.weather[0].main;
@@ -62,20 +41,11 @@ class _SearchHomeScreenState extends State<SearchHomeScreen> {
           tempMax: "${max.round()}°",
           tempMin: "${min.round()}°",
         ));
-      } catch (e) {
-        print('Error loading weather for $city: $e');
-      }
     }
     setState(() {
       history = loaded;
       isLoading = false;
     });
-  }
-
-  Future<void> saveSelectedCity(String cityName) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('selected_city', cityName);
-    print('Saved selected city: $cityName');
   }
 
   @override
@@ -100,7 +70,7 @@ class _SearchHomeScreenState extends State<SearchHomeScreen> {
                 child: AbsorbPointer(
                   child: TextField(
                     decoration: InputDecoration(
-                      hintText: 'Nhập vị trí',
+                      hintText: 'Enter location',
                       hintStyle: const TextStyle(color: Colors.white70),
                       prefixIcon: const Icon(Icons.search, color: Colors.white),
                       filled: true,
@@ -121,7 +91,7 @@ class _SearchHomeScreenState extends State<SearchHomeScreen> {
                 )
               else if (history.isEmpty)
                 const Center(
-                  child: Text("Chưa có lịch sử tìm kiếm", style: TextStyle(color: Colors.grey)),
+                  child: Text("No search history", style: TextStyle(color: Colors.grey)),
                 )
               else
                 Expanded(
@@ -142,7 +112,7 @@ class _SearchHomeScreenState extends State<SearchHomeScreen> {
   Widget buildCityCard(CityWeather city) {
     return GestureDetector(
       onTap: () async {
-        await saveSelectedCity(city.name); // Lưu thành phố được chọn
+        await saveSelectedCity(city.name);
         final data = await ApiHelper.getWeatherByCityName(cityName: city.name);
         if (context.mounted) {
           Navigator.push(

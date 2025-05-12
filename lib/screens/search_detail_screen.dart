@@ -30,7 +30,6 @@ class _SearchDetailScreenState extends ConsumerState<SearchDetailScreen> {
 
   Future<void> saveCityToHistory(String cityName) async {
     final prefs = await SharedPreferences.getInstance();
-    // Lưu vào lịch sử tìm kiếm
     final List<String> history = prefs.getStringList('search_history') ?? [];
     if (!history.contains(cityName)) {
       history.add(cityName);
@@ -38,12 +37,8 @@ class _SearchDetailScreenState extends ConsumerState<SearchDetailScreen> {
         history.removeAt(0);
       }
       await prefs.setStringList('search_history', history);
-      print('Saved history: $history');
     }
-    // Lưu thành phố được chọn cuối cùng
     await prefs.setString('selected_city', cityName);
-    print('Saved selected city: $cityName');
-    // Làm mới provider để WeatherScreen cập nhật
     ref.invalidate(currentWeatherProvider);
   }
 
@@ -72,7 +67,7 @@ class _SearchDetailScreenState extends ConsumerState<SearchDetailScreen> {
         'weather_code': result.weather[0].id,
       });
     } catch (e) {
-      setState(() => error = "Không tìm thấy thành phố này");
+      setState(() => error = "This city name was not found");
     } finally {
       setState(() => isLoading = false);
     }
@@ -83,7 +78,7 @@ class _SearchDetailScreenState extends ConsumerState<SearchDetailScreen> {
     return Scaffold(
       backgroundColor: AppColors.secondaryBlack,
       appBar: AppBar(
-        title: const Text("Tìm kiếm địa điểm"),
+        title: const Text("Search location"),
         backgroundColor: AppColors.secondaryBlack,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -97,7 +92,7 @@ class _SearchDetailScreenState extends ConsumerState<SearchDetailScreen> {
               controller: txtSearch,
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
-                hintText: "Nhập tên thành phố...",
+                hintText: "Enter city name...",
                 hintStyle: const TextStyle(color: Colors.white60),
                 prefixIcon: const Icon(Icons.search, color: Colors.white),
                 filled: true,
