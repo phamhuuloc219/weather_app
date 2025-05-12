@@ -84,7 +84,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   // Thông tin ứng dụng
                   ListTile(
                     title: const Text(
-                      'Phiên bản ứng dụng',
+                      'Version',
                       style: TextStyles.subtitleText,
                     ),
                     subtitle: const Text(
