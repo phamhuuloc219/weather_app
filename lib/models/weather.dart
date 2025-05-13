@@ -35,25 +35,25 @@ class Weather {
   });
 
   factory Weather.fromJson(Map<String, dynamic> json) => Weather(
-        coord: Coord.fromJson(json['coord'] as Map<String, dynamic>),
-        weather: (json['weather'] as List<dynamic>)
-            .map((e) => WeatherData.fromJson(e as Map<String, dynamic>))
-            .toList(),
-        base: json['base'] as String,
-        main: Main.fromJson(json['main'] as Map<String, dynamic>),
-        visibility: json['visibility'] ?? 0,
-        wind: Wind.fromJson(json['wind'] as Map<String, dynamic>),
-        rain: json['rain'] != null
-            ? Rain.fromJson(json['rain'] as Map<String, dynamic>)
-            : null,
-        clouds: Clouds.fromJson(json['clouds'] as Map<String, dynamic>),
-        dt: json['dt'] as int,
-        sys: Sys.fromJson(json['sys'] as Map<String, dynamic>),
-        timezone: json['timezone'] as int,
-        id: json['id'] as int,
-        name: json['name'] as String,
-        cod: json['cod'] as int,
-      );
+    coord: Coord.fromJson(json['coord'] as Map<String, dynamic>),
+    weather: (json['weather'] as List<dynamic>)
+        .map((e) => WeatherData.fromJson(e as Map<String, dynamic>))
+        .toList(),
+    base: json['base'] as String,
+    main: Main.fromJson(json['main'] as Map<String, dynamic>),
+    visibility: json['visibility'] ?? 0,
+    wind: Wind.fromJson(json['wind'] as Map<String, dynamic>),
+    rain: json['rain'] != null
+        ? Rain.fromJson(json['rain'] as Map<String, dynamic>)
+        : null,
+    clouds: Clouds.fromJson(json['clouds'] as Map<String, dynamic>),
+    dt: json['dt'] as int,
+    sys: Sys.fromJson(json['sys'] as Map<String, dynamic>),
+    timezone: json['timezone'] as int,
+    id: json['id'] as int,
+    name: json['name'] as String,
+    cod: json['cod'] as int,
+  );
 }
 
 @immutable
@@ -67,9 +67,9 @@ class Coord {
   });
 
   factory Coord.fromJson(Map<String, dynamic> json) => Coord(
-        lon: json['lon'] as double,
-        lat: json['lat'] as double,
-      );
+    lon: json['lon'] as double,
+    lat: json['lat'] as double,
+  );
 }
 
 @immutable
@@ -87,11 +87,11 @@ class WeatherData {
   });
 
   factory WeatherData.fromJson(Map<String, dynamic> json) => WeatherData(
-        id: json['id'] as int,
-        main: json['main'] as String,
-        description: json['description'] as String,
-        icon: json['icon'] as String,
-      );
+    id: json['id'] as int,
+    main: json['main'] as String,
+    description: json['description'] as String,
+    icon: json['icon'] as String,
+  );
 }
 
 @immutable
@@ -124,11 +124,11 @@ class Main {
     tempMin: (json['temp_min'] as num).toDouble(),
     tempMax: (json['temp_max'] as num).toDouble(),
     pressure: json['pressure'],
-        humidity: json['humidity'],
-        seaLevel: json['sea_level'],
-        grndLevel: json['grnd_level'],
-        visibility: json['visibility'],
-      );
+    humidity: json['humidity'],
+    seaLevel: json['sea_level'],
+    grndLevel: json['grnd_level'],
+    visibility: json['visibility'],
+  );
 }
 
 @immutable
@@ -144,10 +144,10 @@ class Wind {
   });
 
   factory Wind.fromJson(Map<String, dynamic> json) => Wind(
-        speed: json['speed'] ?? 0.0,
-        deg: json['deg'] ?? 0,
-        gust: json['gust'],
-      );
+    speed: json['speed'] ?? 0.0,
+    deg: json['deg'] ?? 0,
+    gust: json['gust'],
+  );
 }
 
 @immutable
@@ -191,10 +191,10 @@ class Sys {
   });
 
   factory Sys.fromJson(Map<String, dynamic> json) => Sys(
-        type: json['type'] ?? 0,
-        id: json['id'] ?? 0,
-        country: json['country'] ?? '',
-        sunrise: json['sunrise'] ?? 0,
-        sunset: json['sunset'] ?? 0,
-      );
+    type: json['type'] ?? 0,
+    id: json['id'] ?? 0,
+    country: json['country'] ?? '',
+    sunrise: json['sunrise'] ?? 0,
+    sunset: json['sunset'] ?? 0,
+  );
 }

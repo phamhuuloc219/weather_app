@@ -1,7 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'get_current_weather_provider.dart';
-
 Future<List<String>> getSearchHistory() async {
   final prefs = await SharedPreferences.getInstance();
   return prefs.getStringList('search_history') ?? [];

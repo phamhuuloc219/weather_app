@@ -41,6 +41,7 @@ dependencies:
   dio: ^5.7.0
   location: ^6.0.2
   shared_preferences: ^2.5.3
+  change_case: ^2.2.0
 
 dev_dependencies:
   flutter_test:

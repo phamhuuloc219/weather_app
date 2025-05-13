@@ -9,6 +9,7 @@ android {
     namespace = "com.example.weather_app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
+    //ndkVersion = "27.212479081"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

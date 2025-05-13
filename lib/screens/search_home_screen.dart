@@ -25,9 +25,10 @@ class _SearchHomeScreenState extends State<SearchHomeScreen> {
 
   Future<void> loadSearchHistory() async {
     setState(() => isLoading = true);
-    final cityNames = await getSearchHistory();
-    final List<CityWeather> loaded = [];
-    for (var city in cityNames) {
+    try {
+      final cityNames = await getSearchHistory();
+      final List<CityWeather> loaded = [];
+      for (var city in cityNames) {
         final data = await ApiHelper.getWeatherByCityName(cityName: city);
         final temp = data.main.temp;
         final cond = data.weather[0].main;
@@ -41,11 +42,20 @@ class _SearchHomeScreenState extends State<SearchHomeScreen> {
           tempMax: "${max.round()}°",
           tempMin: "${min.round()}°",
         ));
+      }
+      setState(() {
+        history = loaded;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        history = [];
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading search history: $e')),
+      );
     }
-    setState(() {
-      history = loaded;
-      isLoading = false;
-    });
   }
 
   @override
@@ -59,13 +69,17 @@ class _SearchHomeScreenState extends State<SearchHomeScreen> {
             children: [
               GestureDetector(
                 onTap: () async {
-                  await Navigator.push(
+                  // Nhận giá trị trả về từ SearchDetailScreen
+                  final shouldRefresh = await Navigator.push<bool>(
                     context,
                     MaterialPageRoute(
                       builder: (_) => const SearchDetailScreen(),
                     ),
                   );
-                  loadSearchHistory();
+                  // Nếu shouldRefresh là true, làm mới lịch sử
+                  if (shouldRefresh == true) {
+                    loadSearchHistory();
+                  }
                 },
                 child: AbsorbPointer(
                   child: TextField(

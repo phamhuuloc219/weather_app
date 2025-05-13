@@ -16,3 +16,4 @@ final currentWeatherProvider = FutureProvider((ref) async {
   final selectedCity = prefs.getString('selected_city') ?? 'Nha Trang'; // Mặc định là
   return await ApiHelper.getWeatherByCityName(cityName: selectedCity);
 });
+

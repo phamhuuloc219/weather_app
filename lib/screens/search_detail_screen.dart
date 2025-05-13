@@ -5,7 +5,7 @@ import 'package:weather_app/screens/weather_detail_screen.dart';
 import 'package:weather_app/services/api_helper.dart';
 import 'package:weather_app/constants/app_colors.dart';
 import 'package:weather_app/constants/text_styles.dart';
-import 'package:weather_app/providers/get_current_weather_provider.dart';
+
 
 class SearchDetailScreen extends ConsumerStatefulWidget {
   const SearchDetailScreen({super.key});
@@ -28,7 +28,21 @@ class _SearchDetailScreenState extends ConsumerState<SearchDetailScreen> {
     return Icons.device_unknown;
   }
 
-  Future<void> saveCityToHistory(String cityName) async {
+  // Future<void> saveCityToHistory(String cityName) async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final List<String> history = prefs.getStringList('search_history') ?? [];
+  //   if (!history.contains(cityName)) {
+  //     history.add(cityName);
+  //     if (history.length > 10) {
+  //       history.removeAt(0);
+  //     }
+  //     await prefs.setStringList('search_history', history);
+  //   }
+  //   await prefs.setString('selected_city', cityName);
+  //   ref.invalidate(currentWeatherProvider);
+  // }
+
+  Future<void> saveToHistoryOnly(String cityName) async {
     final prefs = await SharedPreferences.getInstance();
     final List<String> history = prefs.getStringList('search_history') ?? [];
     if (!history.contains(cityName)) {
@@ -37,9 +51,14 @@ class _SearchDetailScreenState extends ConsumerState<SearchDetailScreen> {
         history.removeAt(0);
       }
       await prefs.setStringList('search_history', history);
+      print('History updated: $history');
     }
+  }
+
+  Future<void> setDefaultCity(String cityName) async {
+    final prefs = await SharedPreferences.getInstance();
     await prefs.setString('selected_city', cityName);
-    ref.invalidate(currentWeatherProvider);
+    print('Default city set: $cityName');
   }
 
   Future<void> fetchWeather(String cityName) async {
@@ -50,7 +69,6 @@ class _SearchDetailScreenState extends ConsumerState<SearchDetailScreen> {
     });
     try {
       final result = await ApiHelper.getWeatherByCityName(cityName: cityName);
-      await saveCityToHistory(cityName);
       setState(() => data = {
         'name': result.name,
         'condition': result.weather[0].main,
@@ -113,7 +131,7 @@ class _SearchDetailScreenState extends ConsumerState<SearchDetailScreen> {
               const Center(child: CircularProgressIndicator(color: Colors.white)),
             if (error != null)
               Text(error!, style: const TextStyle(color: Colors.redAccent)),
-            if (data != null)
+            if (data != null) ...[
               GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -169,7 +187,27 @@ class _SearchDetailScreenState extends ConsumerState<SearchDetailScreen> {
                     ],
                   ),
                 ),
-              )
+              ),
+              const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.topLeft, //
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.accentBlue,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: () async {
+                    await saveToHistoryOnly(data!['name']);
+                    Navigator.pop(context, true);
+                  },
+                  child: Text(
+                    "Set ${data!['name']} at default",
+                    style: const TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
