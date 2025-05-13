@@ -128,7 +128,7 @@ class _SearchHomeScreenState extends State<SearchHomeScreen> {
   Widget buildCityCard(CityWeather city) {
     return GestureDetector(
       onTap: () async {
-        await saveSelectedCity(city.name);
+        // await saveSelectedCity(city.name);
         final data = await ApiHelper.getWeatherByCityName(cityName: city.name);
         if (context.mounted) {
           Navigator.push(

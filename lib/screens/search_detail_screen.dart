@@ -110,7 +110,7 @@ class _SearchDetailScreenState extends ConsumerState<SearchDetailScreen> {
               onSubmitted: (value) async {
                 if (value.isNotEmpty) {
                   fetchWeather(value);
-                  await saveToHistoryOnly(value);
+                  await saveToHistoryOnly(value.toLowerCase());
                 }
               },
             ),
@@ -187,7 +187,6 @@ class _SearchDetailScreenState extends ConsumerState<SearchDetailScreen> {
                   ),
                   onPressed: () async {
                     await setDefaultCity(data!['name']);
-                    await saveToHistoryOnly(data!['name']); // Thêm vào lịch sử khi set default
                     Navigator.pop(context, true);
                   },
                   child: Text(
