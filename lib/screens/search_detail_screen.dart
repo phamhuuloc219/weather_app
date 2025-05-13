@@ -5,7 +5,7 @@ import 'package:weather_app/screens/weather_detail_screen.dart';
 import 'package:weather_app/services/api_helper.dart';
 import 'package:weather_app/constants/app_colors.dart';
 import 'package:weather_app/constants/text_styles.dart';
-
+import 'package:weather_app/providers/get_current_weather_provider.dart'; // Đảm bảo import provider
 
 class SearchDetailScreen extends ConsumerStatefulWidget {
   const SearchDetailScreen({super.key});
@@ -28,20 +28,6 @@ class _SearchDetailScreenState extends ConsumerState<SearchDetailScreen> {
     return Icons.device_unknown;
   }
 
-  // Future<void> saveCityToHistory(String cityName) async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final List<String> history = prefs.getStringList('search_history') ?? [];
-  //   if (!history.contains(cityName)) {
-  //     history.add(cityName);
-  //     if (history.length > 10) {
-  //       history.removeAt(0);
-  //     }
-  //     await prefs.setStringList('search_history', history);
-  //   }
-  //   await prefs.setString('selected_city', cityName);
-  //   ref.invalidate(currentWeatherProvider);
-  // }
-
   Future<void> saveToHistoryOnly(String cityName) async {
     final prefs = await SharedPreferences.getInstance();
     final List<String> history = prefs.getStringList('search_history') ?? [];
@@ -58,7 +44,8 @@ class _SearchDetailScreenState extends ConsumerState<SearchDetailScreen> {
   Future<void> setDefaultCity(String cityName) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('selected_city', cityName);
-    print('Default city set: $cityName');
+    // Làm mới currentWeatherProvider để cập nhật giao diện
+    ref.invalidate(currentWeatherProvider);
   }
 
   Future<void> fetchWeather(String cityName) async {
@@ -120,9 +107,10 @@ class _SearchDetailScreenState extends ConsumerState<SearchDetailScreen> {
                   borderSide: BorderSide.none,
                 ),
               ),
-              onSubmitted: (value) {
+              onSubmitted: (value) async {
                 if (value.isNotEmpty) {
                   fetchWeather(value);
+                  await saveToHistoryOnly(value);
                 }
               },
             ),
@@ -190,7 +178,7 @@ class _SearchDetailScreenState extends ConsumerState<SearchDetailScreen> {
               ),
               const SizedBox(height: 16),
               Align(
-                alignment: Alignment.topLeft, //
+                alignment: Alignment.topLeft,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.accentBlue,
@@ -198,7 +186,8 @@ class _SearchDetailScreenState extends ConsumerState<SearchDetailScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: () async {
-                    await saveToHistoryOnly(data!['name']);
+                    await setDefaultCity(data!['name']);
+                    await saveToHistoryOnly(data!['name']); // Thêm vào lịch sử khi set default
                     Navigator.pop(context, true);
                   },
                   child: Text(

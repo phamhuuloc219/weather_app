@@ -1,3 +1,4 @@
+import 'package:change_case/change_case.dart';
 import 'package:flutter/material.dart';
 import 'package:weather_app/models/city_weather.dart';
 import 'package:weather_app/providers/search_provider.dart';
@@ -57,6 +58,7 @@ class _SearchHomeScreenState extends State<SearchHomeScreen> {
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +169,7 @@ class _SearchHomeScreenState extends State<SearchHomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(city.name, style: const TextStyle(fontSize: 18, color: Colors.white)),
+                    Text(city.name.toCapitalCase(), style: const TextStyle(fontSize: 18, color: Colors.white)),
                     const SizedBox(height: 4),
                     Text(
                       '${city.condition}  ${city.tempMax} / ${city.tempMin}',

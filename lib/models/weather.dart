@@ -145,7 +145,7 @@ class Wind {
 
   factory Wind.fromJson(Map<String, dynamic> json) => Wind(
     speed: json['speed'] ?? 0.0,
-    deg: json['deg'] ?? 0,
+    deg: json['deg'] ?? 0.0,
     gust: json['gust'],
   );
 }
