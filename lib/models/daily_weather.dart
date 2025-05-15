@@ -3,7 +3,6 @@ class DailyWeather {
   final int weatherCode;
   final double maxTemp;
   final double minTemp;
-
   final double windSpeed;
   final double humidity;
   final double feelsLike;

@@ -13,3 +13,4 @@ class CityWeather {
     required this.tempMin,
   });
 }
+
