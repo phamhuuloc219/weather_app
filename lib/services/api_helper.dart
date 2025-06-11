@@ -4,7 +4,6 @@ import '/constants/constants.dart';
 import '/models/hourly_weather.dart';
 import '/models/weather.dart';
 import '/models/weekly_weather.dart';
-import '/services/getlocator.dart';
 import '/utils/logging.dart';
 
 @immutable
@@ -12,22 +11,8 @@ class ApiHelper {
   static const baseUrl = 'https://api.openweathermap.org/data/2.5';
   static double lat = 0.0;
   static double lon = 0.0;
-  static final dio = Dio();
+  static final dio = Dio(); // client duy nhat de goi api
 
-  //! Get lat and lon
-  static Future<void> fetchLocation() async {
-    final location = await getLocation();
-    lat = location.latitude;
-    lon = location.longitude;
-  }
-
-  //* Current Weather
-  static Future<Weather> getCurrentWeather() async {
-    await fetchLocation();
-    final url = _constructWeatherUrl();
-    final response = await _fetchData(url);
-    return Weather.fromJson(response);
-  }
 
   //* Hourly Weather
   static Future<HourlyWeather> getHourlyForecast({String? cityName}) async {
@@ -35,26 +20,33 @@ class ApiHelper {
       final cityWeather = await getWeatherByCityName(cityName: cityName);
       lat = cityWeather.coord.lat;
       lon = cityWeather.coord.lon;
-    } else {
-      await fetchLocation();
     }
     final url = _constructForecastUrl();
     final response = await _fetchData(url);
     return HourlyWeather.fromJson(response);
   }
 
-  //* Weekly weather
+
   static Future<WeeklyWeather> getWeeklyForecast({String? cityName}) async {
     if (cityName != null) {
       final cityWeather = await getWeatherByCityName(cityName: cityName);
       lat = cityWeather.coord.lat;
       lon = cityWeather.coord.lon;
-    } else {
-      await fetchLocation();
     }
     final url = _constructWeeklyForecastUrl();
     final response = await _fetchData(url);
-    return WeeklyWeather.fromJson(response);
+    final data = response as Map<String, dynamic>;
+    final dailyData = <Map<String, dynamic>>[];
+    final dates = <String>{};
+    for (var item in data['list']) {
+      final date = DateTime.parse(item['dt_txt'].substring(0, 10));
+      final dateStr = date.toIso8601String().substring(0, 10);
+      if (!dates.contains(dateStr)) {
+        dates.add(dateStr);
+        dailyData.add(item);
+      }
+    }
+    return WeeklyWeather.fromJson({'list': dailyData});
   }
 
 

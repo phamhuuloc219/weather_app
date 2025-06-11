@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:weather_app/extensions/strings.dart';
 import 'package:weather_app/screens/weather_detail_screen.dart';
 import 'package:weather_app/screens/weather_screen/weather_info.dart';
@@ -70,12 +71,13 @@ class WeatherScreen extends ConsumerWidget {
                 ),
                 InkWell(
                   onTap: () {
+                    final formattedTime = Jiffy.parseFromDateTime(currentDate).format(pattern: 'Hm');
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => WeatherDetailScreen(
-                          city: weather.name ?? 'Unknown City',
-                          date: currentDate.toString(),
+                          city: weather.name ,
+                          date: formattedTime,
                           weatherCode: weather.weather[0].id ?? 0,
                           maxTemp: weather.main.temp ?? 0.0,
                           minTemp: weather.main.temp ?? 0.0,
