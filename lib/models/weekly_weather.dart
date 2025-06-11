@@ -8,21 +8,21 @@ class Current {
   });
 
   factory Current.fromJson(Map<String, dynamic> json) => Current(
-        time: json["time"],
-        interval: json["interval"],
-      );
+    time: json["time"] as String,
+    interval: json["interval"] as int,
+  );
 
   Map<String, dynamic> toJson() => {
-        "time": time,
-        "interval": interval,
-      };
+    "time": time,
+    "interval": interval,
+  };
 }
 
 class Daily {
-  final List<dynamic> time;
-  final List<dynamic> weatherCode;
-  final List<dynamic> temperature2mMax;
-  final List<dynamic> temperature2mMin;
+  final List<String> time;
+  final List<int> weatherCode;
+  final List<double> temperature2mMax;
+  final List<double> temperature2mMin;
 
   Daily({
     required this.time,
@@ -31,75 +31,54 @@ class Daily {
     required this.temperature2mMin,
   });
 
-  factory Daily.fromJson(Map<String, dynamic> json) => Daily(
-        time: json["time"],
-        weatherCode: json["weather_code"],
-        temperature2mMax: json["temperature_2m_max"],
-        temperature2mMin: json["temperature_2m_min"],
-      );
+  factory Daily.fromJson(Map<String, dynamic> json) {
+    return Daily(
+      time: List<String>.from(json["time"] as List<dynamic>),
+      weatherCode: List<int>.from(json["weather_code"] as List<dynamic>),
+      temperature2mMax: List<double>.from(json["temperature_2m_max"] as List<dynamic>),
+      temperature2mMin: List<double>.from(json["temperature_2m_min"] as List<dynamic>),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
-        "time": time,
-        "weather_code": weatherCode,
-        "temperature_2m_max": temperature2mMax,
-        "temperature_2m_min": temperature2mMin,
-      };
+    "time": time,
+    "weather_code": weatherCode,
+    "temperature_2m_max": temperature2mMax,
+    "temperature_2m_min": temperature2mMin,
+  };
 }
 
 class WeeklyWeather {
-  final double latitude;
-  final double longitude;
-  final double generationtimeMs;
-  final int utcOffsetSeconds;
-  final String timezone;
-  final String timezoneAbbreviation;
-  final double elevation;
-  final dynamic currentUnits;
-  final dynamic current;
-  final dynamic dailyUnits;
-  final Daily daily;
+  final List<Map<String, dynamic>> list; // Danh sách bản ghi từ OpenWeatherMap
 
-  WeeklyWeather({
-    required this.latitude,
-    required this.longitude,
-    required this.generationtimeMs,
-    required this.utcOffsetSeconds,
-    required this.timezone,
-    required this.timezoneAbbreviation,
-    required this.elevation,
-    required this.currentUnits,
-    required this.current,
-    required this.dailyUnits,
-    required this.daily,
-  });
+  WeeklyWeather({required this.list});
 
-  factory WeeklyWeather.fromJson(Map<String, dynamic> json) => WeeklyWeather(
-        latitude: json["latitude"] ?? 0.0,
-        longitude: json["longitude"] ?? 0.0,
-        generationtimeMs: json["generationtime_ms"] ?? 0.0,
-        utcOffsetSeconds: json["utc_offset_seconds"] ?? 0,
-        timezone: json["timezone"] ?? '',
-        timezoneAbbreviation: json["timezone_abbreviation"] ?? '',
-        elevation: json["elevation"] ?? 0.0,
-        currentUnits: CurrentUnits.fromJson(json["current_units"]),
-        current: Current.fromJson(json["current"]),
-        dailyUnits: DailyUnits.fromJson(json["daily_units"]),
-        daily: Daily.fromJson(json['daily']),
-      );
+  factory WeeklyWeather.fromJson(Map<String, dynamic> json) {
+    return WeeklyWeather(list: List<Map<String, dynamic>>.from(json['list'] ?? []));
+  }
+
+  Daily get daily {
+    return Daily(
+      time: list.map((e) => (e['dt_txt'] as String).substring(0, 10)).toList(),
+      weatherCode: list.map((e) => e['weather'][0]['id'] as int).toList(),
+      temperature2mMax: list
+          .map((e) => (e['main']['temp_max'] is int
+          ? (e['main']['temp_max'] as int).toDouble()
+          : e['main']['temp_max'] as double)
+          .toDouble())
+          .toList(),
+      temperature2mMin: list
+          .map((e) => (e['main']['temp_min'] is int
+          ? (e['main']['temp_min'] as int).toDouble()
+          : e['main']['temp_min'] as double)
+          .toDouble())
+          .toList(),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
-        "latitude": latitude,
-        "longitude": longitude,
-        "generationtime_ms": generationtimeMs,
-        "utc_offset_seconds": utcOffsetSeconds,
-        "timezone": timezone,
-        "timezone_abbreviation": timezoneAbbreviation,
-        "elevation": elevation,
-        "current_units": currentUnits.toJson(),
-        "current": current.toJson(),
-        "daily_units": dailyUnits.toJson(),
-        "daily": daily.toJson(),
-      };
+    'list': list,
+  };
 }
 
 class CurrentUnits {
@@ -109,14 +88,14 @@ class CurrentUnits {
   CurrentUnits({required this.time, required this.interval});
 
   factory CurrentUnits.fromJson(Map<String, dynamic> json) => CurrentUnits(
-        time: json["time"],
-        interval: json["interval"],
-      );
+    time: json["time"] as String,
+    interval: json["interval"] as String,
+  );
 
   Map<String, dynamic> toJson() => {
-        "time": time,
-        "interval": interval,
-      };
+    "time": time,
+    "interval": interval,
+  };
 }
 
 class DailyUnits {
@@ -133,16 +112,17 @@ class DailyUnits {
   });
 
   factory DailyUnits.fromJson(Map<String, dynamic> json) => DailyUnits(
-        time: json["time"],
-        weatherCode: json["weather_code"],
-        temperature2mMax: json["temperature_2m_max"],
-        temperature2mMin: json["temperature_2m_min"],
-      );
+    time: json["time"] as String,
+    weatherCode: json["weather_code"] as String,
+    temperature2mMax: json["temperature_2m_max"] as String,
+    temperature2mMin: json["temperature_2m_min"] as String,
+  );
 
   Map<String, dynamic> toJson() => {
-        "time": time,
-        "weather_code": weatherCode,
-        "temperature_2m_max": temperature2mMax,
-        "temperature_2m_min": temperature2mMin,
-      };
+    "time": time,
+    "weather_code": weatherCode,
+    "temperature_2m_max": temperature2mMax,
+    "temperature_2m_min": temperature2mMin,
+  };
 }
+

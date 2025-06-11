@@ -1,13 +1,14 @@
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Thêm để tùy chỉnh thanh trạng thái
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:weather_app/providers/state_provider.dart';
 import '/views/hourly_forecast_view.dart';
 import '/constants/app_colors.dart';
 import '/constants/text_styles.dart';
 import '/utils/get_weather_icons.dart';
 import '/views/gradient_container.dart';
 
-class WeatherDetailScreen extends StatelessWidget {
+class WeatherDetailScreen extends ConsumerWidget {
   final String city;
   final String date;
   final int weatherCode;
@@ -34,27 +35,27 @@ class WeatherDetailScreen extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    // Tùy chỉnh màu thanh trạng thái
+  Widget build(BuildContext context, WidgetRef ref) {
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
-        statusBarColor: AppColors.secondaryBlack, // Màu nền thanh trạng thái
-        statusBarIconBrightness: Brightness.light, // Màu biểu tượng sáng (trắng)
+        statusBarColor: AppColors.secondaryBlack,
+        statusBarIconBrightness: Brightness.light,
       ),
     );
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Weather Details - $city',
+          "Weather Details - $city",
           style: TextStyles.h1.copyWith(decoration: TextDecoration.none),
         ),
-        backgroundColor: AppColors.secondaryBlack, // Đặt màu nền cho AppBar
+        backgroundColor: AppColors.secondaryBlack,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.white), // Màu trắng để nổi bật
+          icon: const Icon(Icons.arrow_back, color: AppColors.white),
           onPressed: () {
-            Navigator.pop(context); // Quay về trang trước
+            ref.read(selectedHourProvider.notifier).state = null;
+            Navigator.pop(context);
           },
         ),
       ),
@@ -75,18 +76,21 @@ class WeatherDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 30),
                 Image.asset(
-                  getWeatherIcon2(weatherCode),
+                  getWeatherIcon(weatherCode: weatherCode),
                   width: 180,
                   height: 180,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(Icons.error, color: Colors.red, size: 180);
+                  },
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  '${maxTemp.toStringAsFixed(1)}° / ${minTemp.toStringAsFixed(1)}°',
+                  "${maxTemp.toStringAsFixed(1)}° / ${minTemp.toStringAsFixed(1)}°",
                   style: TextStyles.h2.copyWith(decoration: TextDecoration.none),
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Feel like: ${feelsLike.toStringAsFixed(1)}°C',
+                  "Feel like: ${feelsLike.toStringAsFixed(1)}°C",
                   style: TextStyles.subtitleText.copyWith(decoration: TextDecoration.none),
                 ),
               ],
@@ -100,18 +104,18 @@ class WeatherDetailScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildWeatherCard(Icons.wind_power, 'Wind speed', '${windSpeed.toStringAsFixed(1)} km/h'),
+                    _buildWeatherCard(Icons.wind_power, "Wind speed", "${windSpeed.toStringAsFixed(1)} km/h"),
                     const SizedBox(width: 2),
-                    _buildWeatherCard(Icons.water_drop, 'Humidity', '$humidity%'),
+                    _buildWeatherCard(Icons.water_drop, "Humidity", '$humidity%'),
                   ],
                 ),
                 const SizedBox(height: 14),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildWeatherCard(Icons.wb_sunny_outlined, 'Sunrise', sunrise),
+                    _buildWeatherCard(Icons.wb_sunny_outlined, "Sunrise", sunrise),
                     const SizedBox(width: 2),
-                    _buildWeatherCard(Icons.nightlight_outlined, 'Sunset', sunset),
+                    _buildWeatherCard(Icons.nightlight_outlined, "Sunset", sunset),
                   ],
                 ),
               ],

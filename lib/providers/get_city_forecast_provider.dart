@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '/models/weather.dart';
 import '/services/api_helper.dart';
 

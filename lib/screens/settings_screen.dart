@@ -12,31 +12,12 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _isCelsius = true; // Mặc định dùng Celsius
-
-  @override
-  void initState() {
-    super.initState();
-    _loadSettings();
-  }
-
-  Future<void> _loadSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _isCelsius = prefs.getBool('isCelsius') ?? true; // Mặc định true nếu chưa có
-    });
-  }
-
-  Future<void> _saveSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isCelsius', _isCelsius);
-  }
 
   Future<void> _clearSearchHistory() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('search_history');
+    await prefs.remove("search_history");
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Lịch sử tìm kiếm đã được xóa')),
+      const SnackBar(content: Text("Search history deleted")),
     );
   }
 
@@ -44,7 +25,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return GradientContainer(
         children: [
-          Text("Cài đặt", style: TextStyles.h1, textAlign: TextAlign.center,),
+          Text("Settings", style: TextStyles.h1, textAlign: TextAlign.center,),
           SizedBox(height: 10,),
           SafeArea(
             child: Padding(
@@ -52,46 +33,67 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Chuyển đổi đơn vị nhiệt độ
-                  SwitchListTile(
-                    title: const Text(
-                      'Sử dụng đơn vị Celsius',
-                      style: TextStyles.subtitleText,
-                    ),
-                    value: _isCelsius,
-                    activeColor: AppColors.lightBlue,
-                    onChanged: (value) {
-                      setState(() {
-                        _isCelsius = value;
-                      });
-                      _saveSettings();
-                    },
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 0),
-                  ),
-                  const Divider(color: AppColors.grey, thickness: 1),
-                  // Xóa lịch sử tìm kiếm
                   ListTile(
-                    title: const Text(
-                      'Xóa lịch sử tìm kiếm',
-                      style: TextStyles.subtitleText,
-                    ),
-                    trailing: const Icon(Icons.delete, color: AppColors.white),
-                    onTap: () {
-                      _clearSearchHistory();
-                    },
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text("Delete search history", style: TextStyles.h2),
+                    trailing: const Icon(Icons.delete, color: AppColors.white,),
+                    onTap: _clearSearchHistory,
                   ),
-                  const Divider(color: AppColors.grey, thickness: 1),
-                  // Thông tin ứng dụng
-                  ListTile(
-                    title: const Text(
-                      'Version',
-                      style: TextStyles.subtitleText,
-                    ),
-                    subtitle: const Text(
-                      '1.0.0',
-                      style: TextStyles.subtitleText,
+                  const Divider(color: AppColors.grey),
+
+                  // Version
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Version", style: TextStyles.h2),
+                        Text("1.0.0", style: TextStyles.h2),
+                      ],
                     ),
                   ),
+                  const Divider(color: AppColors.grey),
+                  const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Contact to us", style: TextStyles.h2),
+                      SizedBox(height: 16),
+                    Row(
+                    children: [
+                      Icon(Icons.email, size: 25, color: AppColors.white,),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text("support@weatherapp.com", style:TextStyle(fontSize: 18, color: AppColors.white)),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Icon(Icons.phone, size: 25, color: AppColors.white,),
+                      SizedBox(width: 8),
+                      Text("+84 782 706 952", style: TextStyle(fontSize: 18, color: AppColors.white)),
+                      ],
+                    ),
+                  SizedBox(height: 12),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.location_on, size: 25, color: AppColors.white,),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                        "2 Nguyen Dinh Chieu St, Vinh Tho Ward, Nha Trang City, Khanh Hoa Province",
+                        style: TextStyle(fontSize: 18, color: AppColors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                  ],
+                  )
+                  )
                 ],
               ),
             ),

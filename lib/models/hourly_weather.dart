@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart' show immutable;
-
 import '/models/weather.dart';
 
 @immutable
